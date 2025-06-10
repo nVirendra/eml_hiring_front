@@ -534,7 +534,7 @@ const DynamicFormSystem = () => {
                   : 'text-gray-600 hover:text-gray-800'
               }`}
             >
-              Candidate Form
+              Preview Form
             </button>
           </div>
         </div>

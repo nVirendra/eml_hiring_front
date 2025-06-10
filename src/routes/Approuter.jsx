@@ -2,6 +2,8 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import CandidateForm from '../pages/CandidateForm';
 import FormBuilder from '../pages/FormBuilder'
 import DynamicFormSystem from '../pages/DynamicFormSystem';
+import DashboardPage from '../pages/DashboardPage';
+import CandidateResponsePage from '../pages/[responseId]'
 const AppRouter = () => {
   return (
     <Router>
@@ -9,6 +11,8 @@ const AppRouter = () => {
         <Route path="/" element={<CandidateForm/>} />
         <Route path="/form-builder" element={<FormBuilder/>} />
         <Route path='/new-form-builder' element={<DynamicFormSystem/>} />
+        <Route path='/dashboard' element={<DashboardPage/>} />
+        <Route path='/candidate-response/:responseId' element={<CandidateResponsePage/>} />
       </Routes>
     </Router>
   );

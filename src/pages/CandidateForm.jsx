@@ -17,70 +17,64 @@ const CandidateForm = () => {
     currentCompany: '',
     companyState: '',
     companyCity: '',
+    companyDesignation: '',
     noticePeriod: '',
+    techId: '',
     tech: '',
     questions: {},
   });
 
-  const fetchTechnologies = async () => {
-    try {
-      const result = await axios.get(`${API_BASE_URL}/forms`);
-      if (result.data.success) {
-        setTechRoles(result.data.data);
-      }
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}/forms`).then((res) => {
+      if (res.data.success) setTechRoles(res.data.data);
+    });
+  }, []);
 
   useEffect(() => {
-    fetchTechnologies();
-  }, []);
+    const loadQuestions = async () => {
+      if (!formData.tech) return;
+      const res = await axios.get(`${API_BASE_URL}/forms/${formData.tech}`);
+      if (res.data.success) {
+        setFormData((prev) => ({ ...prev, techId: res.data.data[0]._id }));
+        setDynamicQuestions(res.data.data[0].questions);
+      }
+    };
+    loadQuestions();
+  }, [formData.tech]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleQuestionChange = (field, value) => {
+  const handleQuestionChange = (id, value) => {
     setFormData((prev) => ({
       ...prev,
-      questions: {
-        ...prev.questions,
-        [field]: value,
-      },
+      questions: { ...prev.questions, [id]: value },
     }));
   };
 
-  useEffect(() => {
-    const fetchDynamicForm = async () => {
-      if (!formData.tech) return;
-      try {
-        const res = await axios.get(`${API_BASE_URL}/forms/${formData.tech}`);
-        if (res.data.success) {
-          setDynamicQuestions(res.data.data[0].questions);
-        }
-      } catch (err) {
-        console.error('Error loading form:', err);
-      }
-    };
+  const handleSubmit = async () => {
+    try {
+      const result = await axios.post(`${API_BASE_URL}/responses`, formData);
+      console.log('Submitted:', result.data);
+    } catch (err) {
+      console.error('Submission error:', err);
+    }
+  };
 
-    fetchDynamicForm();
-  }, [formData.tech]);
-
-  const renderQuestions = (questions) => {
-    return questions.map((q) => {
-      const fieldValue = formData.questions[q.id] || (q.type === 'checkbox' ? [] : '');
-
+  const renderQuestions = (questions) =>
+    questions.map((q) => {
+      const value = formData.questions[q.id] || (q.type === 'checkbox' ? [] : '');
       switch (q.type) {
         case 'number':
         case 'select':
           return (
             <div key={q.id}>
-              <label className="block text-sm font-medium text-gray-700 mt-2">{q.question}</label>
+              <label className="block font-medium text-gray-700 mt-4">{q.question}</label>
               <select
-                value={fieldValue}
+                value={value}
                 onChange={(e) => handleQuestionChange(q.id, e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2"
               >
                 <option value="">-- Select --</option>
                 {q.options.map((opt) => (
@@ -91,92 +85,105 @@ const CandidateForm = () => {
               </select>
             </div>
           );
-
         case 'checkbox':
           return (
-            <div key={q.id}>
-              <label className="block text-sm font-medium text-gray-700 mt-2">{q.question}</label>
-              <div className="flex flex-wrap gap-3 mt-1">
+            <div key={q.id} className="mt-4">
+              <label className="block font-medium text-gray-700">{q.question}</label>
+              <div className="flex flex-wrap gap-4 mt-2">
                 {q.options.map((opt) => (
-                  <label key={opt._id} className="inline-flex items-center">
+                  <label key={opt._id} className="flex items-center gap-2 text-sm text-gray-600">
                     <input
                       type="checkbox"
-                      className="form-checkbox h-4 w-4 text-blue-600"
                       value={opt.value}
-                      checked={fieldValue.includes(opt.value)}
+                      checked={value.includes(opt.value)}
                       onChange={(e) => {
-                        const selected = new Set(fieldValue);
-                        if (e.target.checked) {
-                          selected.add(opt.value);
-                        } else {
-                          selected.delete(opt.value);
-                        }
-                        handleQuestionChange(q.id, Array.from(selected));
+                        const updated = new Set(value);
+                        e.target.checked ? updated.add(opt.value) : updated.delete(opt.value);
+                        handleQuestionChange(q.id, Array.from(updated));
                       }}
+                      className="text-indigo-600 rounded"
                     />
-                    <span className="ml-2">{opt.label || opt.value}</span>
+                    {opt.label || opt.value}
                   </label>
                 ))}
               </div>
             </div>
           );
-
         default:
           return null;
       }
     });
-  };
 
-  const handleNext = () => {
-    if (step === 3 && !formData.tech) return alert('Please select a tech role.');
-    setStep((prev) => prev + 1);
-  };
-
-  const handleBack = () => setStep((prev) => prev - 1);
-
-  const handleSubmit = () => {
-    console.log('Form Submitted:', formData);
-  };
+  const stepTitles = ['Basic Info', 'Company Info', 'Technology & Questions'];
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded shadow">
+    <div className="max-w-4xl mx-auto py-10 px-6 bg-white rounded-xl shadow-lg space-y-8">
+      {/* Step Indicator */}
+      <div className="flex justify-between items-center mb-4">
+        {stepTitles.map((label, index) => (
+          <div key={index} className="flex items-center space-x-2">
+            <div
+              className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-sm ${
+                step === index + 1 ? 'bg-indigo-600' : 'bg-gray-300'
+              }`}
+            >
+              {index + 1}
+            </div>
+            <span className={`text-sm ${step === index + 1 ? 'text-indigo-600 font-medium' : 'text-gray-500'}`}>
+              {label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Step 1 */}
       {step === 1 && (
         <>
-          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Basic Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input placeholder="Full Name" className="border p-2 rounded" onChange={(e) => handleChange('name', e.target.value)} />
-            <input placeholder="Phone" className="border p-2 rounded" onChange={(e) => handleChange('phone', e.target.value)} />
-            <input placeholder="Email" className="border p-2 rounded" onChange={(e) => handleChange('email', e.target.value)} />
-            <input type="date" className="border p-2 rounded" onChange={(e) => handleChange('dob', e.target.value)} />
-            <input placeholder="State" className="border p-2 rounded" onChange={(e) => handleChange('state', e.target.value)} />
-            <input placeholder="City" className="border p-2 rounded" onChange={(e) => handleChange('city', e.target.value)} />
-            <input placeholder="Experience (Years)" className="border p-2 rounded" onChange={(e) => handleChange('experience', e.target.value)} />
+            {['name', 'phone', 'email', 'dob', 'state', 'city', 'experience'].map((field, i) => (
+              <input
+                key={i}
+                type={field === 'dob' ? 'date' : 'text'}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+                value={formData[field]}
+                onChange={(e) => handleChange(field, e.target.value)}
+                className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            ))}
           </div>
         </>
       )}
 
+      {/* Step 2 */}
       {step === 2 && (
         <>
-          <h2 className="text-xl font-semibold mb-4">Current Company Info</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Current Company Info</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input placeholder="Current Company" className="border p-2 rounded" onChange={(e) => handleChange('currentCompany', e.target.value)} />
-            <input placeholder="Company State" className="border p-2 rounded" onChange={(e) => handleChange('companyState', e.target.value)} />
-            <input placeholder="Company City" className="border p-2 rounded" onChange={(e) => handleChange('companyCity', e.target.value)} />
-            <input placeholder="Notice Period" className="border p-2 rounded" onChange={(e) => handleChange('noticePeriod', e.target.value)} />
+            {['currentCompany', 'companyState', 'companyCity', 'companyDesignation', 'noticePeriod'].map((field, i) => (
+              <input
+                key={i}
+                placeholder={field.replace(/([A-Z])/g, ' $1')}
+                value={formData[field]}
+                onChange={(e) => handleChange(field, e.target.value)}
+                className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            ))}
           </div>
         </>
       )}
 
+      {/* Step 3 */}
       {step === 3 && (
         <>
-          <h2 className="text-xl font-semibold mb-4">Technology Selection</h2>
-          <label className="block text-sm font-medium text-gray-700">Select Technology</label>
+          <h2 className="text-xl font-semibold text-gray-800">Technology & Questions</h2>
+          <label className="block font-medium text-gray-700 mt-2">Select Technology</label>
           <select
-            className="w-full border p-2 mt-1 rounded"
+            className="border border-gray-300 rounded-md p-2 w-full mt-1 focus:ring-2 focus:ring-indigo-500"
             value={formData.tech}
             onChange={(e) => handleChange('tech', e.target.value)}
           >
-            <option value="">-- Choose Tech Stack --</option>
+            <option value="">-- Choose Technology --</option>
             {techRoles.map((role) => (
               <option key={role._id} value={role.technology}>
                 {role.technology}
@@ -184,23 +191,36 @@ const CandidateForm = () => {
             ))}
           </select>
 
-          <div className="pt-6 space-y-4">{renderQuestions(dynamicQuestions)}</div>
+          <div className="mt-6 space-y-4">{renderQuestions(dynamicQuestions)}</div>
         </>
       )}
 
+      {/* Navigation */}
       <div className="flex justify-between pt-6">
         {step > 1 && (
-          <button onClick={handleBack} className="px-4 py-2 bg-gray-100 rounded border border-gray-300">
+          <button
+            onClick={() => setStep(step - 1)}
+            className="px-4 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
+          >
             Back
           </button>
         )}
         {step < 3 && (
-          <button onClick={handleNext} className="px-4 py-2 bg-blue-600 text-white rounded">
+          <button
+            onClick={() => {
+              if (step === 3 && !formData.tech) return alert('Please select a tech stack');
+              setStep(step + 1);
+            }}
+            className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+          >
             Next
           </button>
         )}
         {step === 3 && (
-          <button onClick={handleSubmit} className="px-4 py-2 bg-green-600 text-white rounded">
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700"
+          >
             Submit
           </button>
         )}
