@@ -43,6 +43,10 @@ const CandidateForm = () => {
     loadQuestions();
   }, [formData.tech]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
+
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -50,7 +54,7 @@ const CandidateForm = () => {
   const handleResumeChange = (e) => {
     const resume = e.target.files?.[0];
     if (resume) {
-      formData.file = resume;
+      setFormData((prev) => ({ ...prev, file: resume }));
     }
   };
 
@@ -63,11 +67,20 @@ const CandidateForm = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log('formData:', formData);
-      const result = await axios.post(`${API_BASE_URL}/responses`, formData, {
+      const form = new FormData();
+      for (const key in formData) {
+        if (key === 'questions') {
+          form.append('questions', JSON.stringify(formData.questions));
+        } else {
+          form.append(key, formData[key]);
+        }
+      }
+      const result = await axios.post(`${API_BASE_URL}/responses`, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      console.log('Submitted:', result.data);
+      if (result.data?.success) {
+        alert('Form submitted successfully');
+      }
     } catch (err) {
       console.error('Submission error:', err);
     }
@@ -135,38 +148,33 @@ const CandidateForm = () => {
       }
     });
 
-  const stepTitles = ['Basic Info', 'Company Info', 'Technology & Questions'];
+  const stepTitles = [
+    'Basic Info',
+    'Company Info',
+    'Technology & Questions',
+    'Preview',
+  ];
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-6 bg-white rounded-xl shadow-lg space-y-8">
-      {/* Logo and Header Section */}
+      {/* Header */}
       <div className="text-center space-y-4 border-b border-gray-200 pb-8">
-        {/* Company Logo */}
         <div className="flex justify-center">
-          <div className="w-30 h-16  rounded-xl flex items-center justify-center shadow-lg">
-            <img src="emilo-logo.png"></img>
+          <div className="w-30 h-16 rounded-xl flex items-center justify-center shadow-lg">
+            <img src="emilo-logo.png" alt="Logo" />
           </div>
         </div>
-
-        {/* Company Name & Tagline */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Emilo Ventures</h1>
-          <p className="text-lg text-indigo-600 font-medium">
-            Where Innovation Meets Opportunity
-          </p>
-        </div>
-
-        {/* Hiring Description */}
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3">
-            Join Our Growing Team
-          </h2>
-          <p className="text-gray-600 leading-relaxed">
-            We're looking for passionate developers and tech enthusiasts to join
-            our dynamic team. Take the first step towards an exciting career
-            with us by completing this application form.
-          </p>
-        </div>
+        <h1 className="text-3xl font-bold text-gray-900">Emilo Ventures</h1>
+        <p className="text-lg text-indigo-600 font-medium">
+          Where Innovation Meets Opportunity
+        </p>
+        <h2 className="text-xl font-semibold text-gray-800 mb-3">
+          Join Our Growing Team
+        </h2>
+        <p className="text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          We're looking for passionate developers to join our team. Complete the
+          application form to get started.
+        </p>
       </div>
 
       {/* Step Indicator */}
@@ -200,37 +208,24 @@ const CandidateForm = () => {
             Basic Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              'name',
-              'phone',
-              'email',
-              'dob',
-              'state',
-              'city',
-              'experience',
-            ].map((field, i) => (
-              <input
-                key={i}
-                type={field === 'dob' ? 'date' : 'text'}
-                placeholder={
-                  field.charAt(0).toUpperCase() +
-                  field.slice(1).replace(/([A-Z])/g, ' $1')
-                }
-                value={formData[field]}
-                onChange={(e) => handleChange(field, e.target.value)}
-                className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
-            ))}
+            {['name', 'phone', 'email', 'dob', 'state', 'city', 'experience'].map(
+              (field, i) => (
+                <input
+                  key={i}
+                  type={field === 'dob' ? 'date' : 'text'}
+                  placeholder={field.replace(/([A-Z])/g, ' $1')}
+                  value={formData[field]}
+                  onChange={(e) => handleChange(field, e.target.value)}
+                  className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+              )
+            )}
           </div>
-          <div className="md:col-span-2">
-            <label
-              htmlFor="resume"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+          <div className="md:col-span-2 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Upload Resume
             </label>
             <input
-              id="resume"
               type="file"
               accept=".pdf,.doc,.docx"
               onChange={handleResumeChange}
@@ -290,12 +285,65 @@ const CandidateForm = () => {
               </option>
             ))}
           </select>
-
-          <div className="mt-6 space-y-4">
-            {renderQuestions(dynamicQuestions)}
-          </div>
+          <div className="mt-6 space-y-4">{renderQuestions(dynamicQuestions)}</div>
         </>
       )}
+
+      {step === 4 && (
+  <div className="space-y-10">
+    <h2 className="text-2xl font-bold text-gray-800 border-b pb-2">
+      Preview Your Application
+    </h2>
+
+    {/* Basic Info */}
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-indigo-700 border-b pb-1">Basic Information</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-800">
+        <div><span className="font-medium">Name:</span> {formData.name}</div>
+        <div><span className="font-medium">Phone:</span> {formData.phone}</div>
+        <div><span className="font-medium">Email:</span> {formData.email}</div>
+        <div><span className="font-medium">DOB:</span> {formData.dob}</div>
+        <div><span className="font-medium">State:</span> {formData.state}</div>
+        <div><span className="font-medium">City:</span> {formData.city}</div>
+        <div><span className="font-medium">Experience:</span> {formData.experience}</div>
+        <div><span className="font-medium">Resume:</span> {formData.file?.name || 'Not uploaded'}</div>
+      </div>
+    </div>
+
+    {/* Company Info */}
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-indigo-700 border-b pb-1">Company Information</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-800">
+        <div><span className="font-medium">Company Name:</span> {formData.currentCompany}</div>
+        <div><span className="font-medium">Company State:</span> {formData.companyState}</div>
+        <div><span className="font-medium">Company City:</span> {formData.companyCity}</div>
+        <div><span className="font-medium">Designation:</span> {formData.companyDesignation}</div>
+        <div><span className="font-medium">Notice Period:</span> {formData.noticePeriod}</div>
+      </div>
+    </div>
+
+    {/* Technology & Questions */}
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-indigo-700 border-b pb-1">Technology & Questions</h3>
+      <div className="text-sm text-gray-800">
+        <div className="mb-2">
+          <span className="font-medium">Technology:</span> {formData.tech}
+        </div>
+        <ul className="space-y-2 list-disc list-inside">
+          {dynamicQuestions.map((q) => (
+            <li key={q.id}>
+              <span className="font-medium">{q.question}</span>:{" "}
+              {Array.isArray(formData.questions[q.id])
+                ? formData.questions[q.id].join(', ')
+                : formData.questions[q.id] || 'N/A'}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {/* Navigation */}
       <div className="flex justify-between pt-6">
@@ -307,7 +355,7 @@ const CandidateForm = () => {
             Back
           </button>
         )}
-        {step < 3 && (
+        {step < 4 && (
           <button
             onClick={() => {
               if (step === 3 && !formData.tech)
@@ -319,13 +367,21 @@ const CandidateForm = () => {
             Next
           </button>
         )}
-        {step === 3 && (
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700"
-          >
-            Submit
-          </button>
+        {step === 4 && (
+          <div className="flex gap-4">
+            <button
+              onClick={() => setStep(1)}
+              className="px-4 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
+            >
+              Edit
+            </button>
+            <button
+              onClick={handleSubmit}
+              className="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700"
+            >
+              Submit
+            </button>
+          </div>
         )}
       </div>
     </div>
