@@ -14,7 +14,7 @@ const CandidateForm = () => {
     state: '',
     city: '',
     experience: '',
-    resume: null,
+    file: null,
     currentCompany: '',
     companyState: '',
     companyCity: '',
@@ -48,9 +48,9 @@ const CandidateForm = () => {
   };
 
   const handleResumeChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      formData.resume = file;
+    const resume = e.target.files?.[0];
+    if (resume) {
+      formData.file = resume;
     }
   };
 
@@ -63,6 +63,7 @@ const CandidateForm = () => {
 
   const handleSubmit = async () => {
     try {
+      console.log('formData:', formData);
       const result = await axios.post(`${API_BASE_URL}/responses`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
