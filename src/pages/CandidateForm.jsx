@@ -3,6 +3,8 @@ import axios from 'axios';
 import { API_BASE_URL } from '../utils/constants';
 
 const CandidateForm = () => {
+  const [submitted, setSubmitted] = useState(false);
+
   const [techRoles, setTechRoles] = useState([]);
   const [step, setStep] = useState(1);
   const [dynamicQuestions, setDynamicQuestions] = useState([]);
@@ -79,8 +81,9 @@ const CandidateForm = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       if (result.data?.success) {
-        alert('Form submitted successfully');
+        setSubmitted(true);
       }
+
     } catch (err) {
       console.error('Submission error:', err);
     }
@@ -155,6 +158,62 @@ const CandidateForm = () => {
     'Preview',
   ];
 
+  if (submitted) {
+  return (
+    <div className="max-w-xl mx-auto py-20 px-6 bg-white rounded-xl shadow-lg text-center space-y-6">
+      {/* Logo Section */}
+      <div className="flex justify-center">
+        <div className="w-32 h-16 rounded-xl flex items-center justify-center shadow-md bg-white">
+          <img src="emilo-logo.png" alt="Emilo Logo" className="h-12 object-contain" />
+        </div>
+      </div>
+
+      {/* Success Message */}
+      <h2 className="text-3xl font-bold text-green-700">🎉 Application Submitted!</h2>
+      <p className="text-gray-600 text-md max-w-md mx-auto">
+        Thank you for applying to <span className="font-semibold text-gray-800">Emilo Ventures</span>.
+        We appreciate your interest. Our team will review your application and reach out soon.
+      </p>
+
+      {/* Button */}
+      <button
+  onClick={() => {
+    // Reset form
+    setFormData({
+      name: '',
+      phone: '',
+      email: '',
+      dob: '',
+      state: '',
+      city: '',
+      experience: '',
+      file: null,
+      currentCompany: '',
+      companyState: '',
+      companyCity: '',
+      companyDesignation: '',
+      noticePeriod: '',
+      techId: '',
+      tech: '',
+      questions: {},
+    });
+    setStep(1);
+    setSubmitted(false);
+
+    // Attempt to close window
+    setTimeout(() => {
+      window.close();
+    }, 100); // delay for cleanup before closing
+  }}
+  className="inline-block mt-6 px-6 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 transition"
+>
+  You may now safely close this tab.
+</button>
+
+    </div>
+  );
+}
+
   return (
     <div className="max-w-4xl mx-auto py-10 px-6 bg-white rounded-xl shadow-lg space-y-8">
       {/* Header */}
@@ -176,6 +235,7 @@ const CandidateForm = () => {
           application form to get started.
         </p>
       </div>
+
 
       {/* Step Indicator */}
       <div className="flex justify-between items-center mb-4">
