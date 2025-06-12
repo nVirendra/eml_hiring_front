@@ -12,7 +12,6 @@ const DashboardPage = () => {
         const res = await axios.get(`${API_BASE_URL}/dashboard/stats`);
         if (res.data.success) {
           setStats(res.data.data);
-          console.log('res.data:',res.data.data);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);

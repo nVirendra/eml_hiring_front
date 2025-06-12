@@ -4,8 +4,9 @@ const CandidateResponse = ({ data }) => {
   const { candidateInfo, techId, responses, totalScore,actualTotalScore, submittedAt } = data;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-10 bg-gray-50 min-h-screen">
+    <div className="p-8 max-w-6xl mx-auto space-y-2 bg-gray-50 min-h-screen">
       <div className="text-3xl font-bold text-gray-800 mb-2">Candidate Response</div>
+      <p className="text-sm text-gray-500">Created on {new Date(candidateInfo.createdAt).toLocaleString()}</p>
       <p className="text-sm text-gray-500">Submitted on {new Date(submittedAt).toLocaleString()}</p>
 
       {/* Basic Information */}

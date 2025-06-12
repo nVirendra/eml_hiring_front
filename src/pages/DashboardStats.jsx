@@ -66,8 +66,12 @@ const DashboardStats = ({ stats }) => {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 mt-1">
+                    Created at: {new Date(resp.candidateInfo.createdAt).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
                     Submitted at: {new Date(resp.submittedAt).toLocaleString()}
                   </p>
+                  
                 </div>
               </Link>
             ))}
