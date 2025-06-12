@@ -1,7 +1,7 @@
 import React from 'react';
 
 const CandidateResponse = ({ data }) => {
-  const { candidateInfo, techId, responses, totalScore, submittedAt } = data;
+  const { candidateInfo, techId, responses, totalScore,actualTotalScore, submittedAt } = data;
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-10 bg-gray-50 min-h-screen">
@@ -16,6 +16,7 @@ const CandidateResponse = ({ data }) => {
           <div><strong>Email:</strong> {candidateInfo.email}</div>
           <div><strong>Phone:</strong> {candidateInfo.phone}</div>
           <div><strong>DOB:</strong> {candidateInfo.dob}</div>
+          <div><strong>Gender:</strong> {candidateInfo.gender}</div>
           <div><strong>State:</strong> {candidateInfo.state}</div>
           <div><strong>City:</strong> {candidateInfo.city}</div>
           <div><strong>Experience:</strong> {candidateInfo.experience}</div>
@@ -37,7 +38,6 @@ const CandidateResponse = ({ data }) => {
       <div className="bg-white shadow-lg rounded-2xl p-6">
         <h2 className="text-xl font-semibold mb-4 text-indigo-600">💻 Technology Selected</h2>
         <p className="text-md text-gray-700"><strong>Technology:</strong> {techId.technology}</p>
-        <p className="text-md text-gray-700"><strong>Form Title:</strong> {techId.title}</p>
       </div>
 
       {/* Question Answers */}
@@ -45,7 +45,7 @@ const CandidateResponse = ({ data }) => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-indigo-600">📝 Question Responses</h2>
           <span className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">
-            Total Score: {totalScore}
+            Total Score: {`${totalScore}/${actualTotalScore}`}
           </span>
         </div>
 

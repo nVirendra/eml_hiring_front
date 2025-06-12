@@ -12,6 +12,7 @@ const CandidateResponsePage = () => {
     axios.get(`${API_BASE_URL}/responses/${responseId}`).then((res) => {
       if (res.data.success) {
         setData(res.data.data);
+        console.log('data: ',data);
       }
     });
   }, []);

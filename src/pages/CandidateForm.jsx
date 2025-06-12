@@ -309,7 +309,7 @@ const CandidateForm = () => {
   </div>
   <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Emilo Ventures</h1>
   <p className="text-sm md:text-base text-indigo-600 font-medium mt-1">If it's there, it's here</p>
-  <h2 className="text-lg md:text-xl font-semibold text-gray-800 mt-3">Join Our Growing Team</h2>
+  <h2 className="text-lg md:text-xl font-semibold text-gray-800 mt-2">Join Our Growing Team</h2>
   <p className="text-sm md:text-base text-gray-600 mt-1 max-w-2xl mx-auto leading-snug">
     We're looking for passionate developers to join our team. Complete the application form to get started.
   </p>

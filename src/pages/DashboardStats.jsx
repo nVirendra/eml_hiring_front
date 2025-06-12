@@ -25,6 +25,21 @@ const DashboardStats = ({ stats }) => {
         </div>
       </div>
 
+      {/* Top Technologies */}
+      <div className="border rounded-xl shadow-sm p-6 bg-gray-50">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">🔥 Technologies</h2>
+        <div className="flex flex-wrap gap-4">
+          {topTechnologies.map((tech) => (
+            <div
+              key={tech._id}
+              className="px-4 py-2 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-medium border border-indigo-200"
+            >
+              {tech._id} — {tech.count} responses
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Recent Responses */}
       <div className="border rounded-xl shadow-sm p-6 bg-gray-50">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">🕓 Recent Responses</h2>
@@ -46,7 +61,7 @@ const DashboardStats = ({ stats }) => {
                         <span className="font-medium">Tech:</span> {resp.techId.technology}
                       </p>
                       <p className="text-sm">
-                        <span className="font-medium">Score:</span> {resp.totalScore}
+                        <span className="font-medium">Score:</span> {`${resp.totalScore}/${resp.actualTotalScore}`}
                       </p>
                     </div>
                   </div>
@@ -60,20 +75,7 @@ const DashboardStats = ({ stats }) => {
         )}
       </div>
 
-      {/* Top Technologies */}
-      <div className="border rounded-xl shadow-sm p-6 bg-gray-50">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">🔥 Top Technologies</h2>
-        <div className="flex flex-wrap gap-4">
-          {topTechnologies.map((tech) => (
-            <div
-              key={tech._id}
-              className="px-4 py-2 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-medium border border-indigo-200"
-            >
-              {tech._id} — {tech.count} responses
-            </div>
-          ))}
-        </div>
-      </div>
+      
     </div>
   );
 };

@@ -13,7 +13,6 @@ const DynamicFormSystem = () => {
   const AdminFormBuilder = () => {
     const [currentForm, setCurrentForm] = useState({
       id: null,
-      title: '',
       technology: '',
       questions: []
     });
@@ -98,7 +97,7 @@ const DynamicFormSystem = () => {
         setForms(prev => [...prev, formToSave]);
       }
       
-      setCurrentForm({ id: null, title: '', technology: '', questions: [] });
+      setCurrentForm({ id: null, technology: '', questions: [] });
       setEditingIndex(-1);
     };
 
@@ -113,16 +112,7 @@ const DynamicFormSystem = () => {
           <h2 className="text-xl font-semibold mb-4">Create Evaluation Form</h2>
           
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">Form Title</label>
-              <input
-                type="text"
-                value={currentForm.title}
-                onChange={(e) => setCurrentForm(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full p-2 border rounded-md"
-                placeholder="e.g., Flutter Developer Assessment"
-              />
-            </div>
+            
             <div>
               <label className="block text-sm font-medium mb-2">Technology</label>
               <input
@@ -316,7 +306,7 @@ const DynamicFormSystem = () => {
             
             <button
               onClick={saveForm}
-              disabled={!currentForm.title || !currentForm.technology || currentForm.questions.length === 0}
+              disabled={!currentForm.technology || currentForm.questions.length === 0}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
             >
               <Save size={16} /> Save Form
@@ -332,7 +322,6 @@ const DynamicFormSystem = () => {
               {forms.map(form => (
                 <div key={form.id} className="border rounded-lg p-4 flex justify-between items-center">
                   <div>
-                    <h4 className="font-medium">{form.title}</h4>
                     <p className="text-sm text-gray-600">{form.technology} • {form.questions.length} questions</p>
                   </div>
                   <button
@@ -407,7 +396,6 @@ const DynamicFormSystem = () => {
                   onClick={() => setSelectedForm(form)}
                   className="text-left p-4 border rounded-lg hover:bg-gray-50"
                 >
-                  <h3 className="font-medium">{form.title}</h3>
                   <p className="text-sm text-gray-600">{form.technology} Assessment</p>
                 </button>
               ))}
@@ -422,7 +410,6 @@ const DynamicFormSystem = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-xl font-semibold">{selectedForm.title}</h2>
               <p className="text-gray-600">{selectedForm.technology} Assessment</p>
             </div>
             <button

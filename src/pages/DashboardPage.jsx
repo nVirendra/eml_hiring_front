@@ -7,12 +7,19 @@ const DashboardPage = () => {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/dashboard/stats`).then((res) => {
-      if (res.data.success){
-        console.log('stats: ',stats);
-         setStats(res.data.data);
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/dashboard/stats`);
+        if (res.data.success) {
+          setStats(res.data.data);
+          console.log('res.data:',res.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
       }
-    });
+    };
+
+    fetchStats();
   }, []);
 
   return (
