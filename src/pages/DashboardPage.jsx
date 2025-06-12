@@ -8,7 +8,10 @@ const DashboardPage = () => {
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/dashboard/stats`).then((res) => {
-      if (res.data.success) setStats(res.data.data);
+      if (res.data.success){
+        console.log('stats: ',stats);
+         setStats(res.data.data);
+      }
     });
   }, []);
 
