@@ -24,6 +24,10 @@ const CandidateResponse = ({ data }) => {
           <div><strong>State:</strong> {candidateInfo.state}</div>
           <div><strong>City:</strong> {candidateInfo.city}</div>
           <div><strong>Experience:</strong> {candidateInfo.experience}</div>
+          <div><strong>Resume:</strong> <a href={candidateInfo.resumeUrl} download target="_blank" rel="noopener noreferrer">
+  <button className="bg-blue-500 text-white px-4 py-2 rounded">Download PDF</button>
+</a>
+</div>
         </div>
       </div>
 
