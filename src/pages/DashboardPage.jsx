@@ -6,12 +6,19 @@ import { API_BASE_URL } from '../utils/constants';
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [selectedTech, setSelectedTech] = useState('');
-  console.log('selectedTech: ',selectedTech);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(1); // default page size
+
+  const handleLimitChange = (e) => {
+    setLimit(parseInt(e.target.value));
+    setPage(1); // reset to first page when limit changes
+  };
+
 
   const fetchStats = async (tech='') => {
       try {
         const res = await axios.get(`${API_BASE_URL}/dashboard/stats`,{
-                  params: tech ? { tech } : {},
+                   params: { tech, page, limit },
         });
         if (res.data.success) {
           setStats(res.data.data);
@@ -22,10 +29,11 @@ const DashboardPage = () => {
     };
 
   useEffect(() => {
-    fetchStats(selectedTech);
-  }, [selectedTech]);
+    fetchStats(selectedTech,page,limit);
+  }, [selectedTech,page,limit]);
 
   const handleTechClick = (techId) => {
+    setPage(1); // reset page on tech change
     setSelectedTech((prev) => (prev === techId ? '' : techId)); // Toggle filter
   };
 
@@ -34,7 +42,9 @@ const DashboardPage = () => {
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="max-w-5xl mx-auto space-y-8 bg-white p-6 rounded-xl shadow-md">
         <h1 className="text-2xl font-bold text-indigo-700">📊 Dashboard Overview</h1>
-        {stats ? <DashboardStats stats={stats} onTechClick={handleTechClick} selectedTech={selectedTech}/> : <p>Loading...</p>}
+        {stats ? <DashboardStats stats={stats} onTechClick={handleTechClick} selectedTech={selectedTech} page={page}
+    setPage={setPage}
+    limit={limit} onLimitChange={handleLimitChange}/> : <p>Loading...</p>}
       </div>
     </div>
   );

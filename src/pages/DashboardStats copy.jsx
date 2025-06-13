@@ -3,7 +3,7 @@ import { FileText, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const DashboardStats = ({ stats,onTechClick ,selectedTech, page, setPage, limit,onLimitChange }) => {
-  const { totalForms, totalResponses, recentResponses,totalTechResponseCount, topTechnologies } = stats;
+  const { totalForms, totalResponses, recentResponses, topTechnologies } = stats;
 
   return (
     <div className="space-y-8">
@@ -110,7 +110,7 @@ const DashboardStats = ({ stats,onTechClick ,selectedTech, page, setPage, limit,
         Page {page}
       </span>
       <button
-        disabled={page * limit >= stats.totalTechResponseCount}
+        disabled={page * limit >= stats.totalMatchingResponses}
         onClick={() => setPage((prev) => prev + 1)}
         className="px-4 py-2 border rounded-md bg-white hover:bg-gray-100 disabled:opacity-50"
       >
