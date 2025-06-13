@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Edit3, Save, X } from 'lucide-react';
 import axios from 'axios';
-import { API_BASE_URL } from '../utils/constants';
+import { API_BASE_URL } from '../../utils/constants';
+import Header from '../../components/Header';
 
 const DynamicFormSystem = () => {
   const [activeTab, setActiveTab] = useState('admin');
@@ -82,11 +83,16 @@ const DynamicFormSystem = () => {
         id: currentForm.id || Date.now(),
         createdAt: new Date().toISOString()
       };
-      
-      console.log('formToSave', formToSave);
+    
 
       try{
-        const result = await axios.post(`${API_BASE_URL}/forms`,formToSave);
+        const token = localStorage.getItem('token'); 
+        const result = await axios.post(`${API_BASE_URL}/forms`,formToSave,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+          }
+        });
       }catch(error){
         console.log('saveForm: ',error.message);
       }
@@ -107,6 +113,7 @@ const DynamicFormSystem = () => {
     };
 
     return (
+      <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="space-y-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h2 className="text-xl font-semibold mb-4">Create Evaluation Form</h2>
@@ -336,6 +343,7 @@ const DynamicFormSystem = () => {
           </div>
         )}
       </div>
+      </div>
     );
   };
 
@@ -497,8 +505,8 @@ const DynamicFormSystem = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">Dynamic Form Evaluation System</h1>
+      <div className="max-w-5xl mx-auto space-y-8 bg-white p-6 rounded-xl shadow-md">
+        <Header/>
         
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
@@ -511,7 +519,7 @@ const DynamicFormSystem = () => {
                   : 'text-gray-600 hover:text-gray-800'
               }`}
             >
-              Admin Panel
+              Form Builder
             </button>
             <button
               onClick={() => setActiveTab('candidate')}

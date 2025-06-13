@@ -1,9 +1,12 @@
 import React from 'react';
-
+import Header from '../../components/Header';
 const CandidateResponse = ({ data }) => {
   const { candidateInfo, techId, responses, totalScore,actualTotalScore, submittedAt } = data;
 
   return (
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+      <div className="max-w-5xl mx-auto space-y-8 bg-white p-6 rounded-xl shadow-md">
+        <Header/>
     <div className="p-8 max-w-6xl mx-auto space-y-2 bg-gray-50 min-h-screen">
       <div className="text-3xl font-bold text-gray-800 mb-2">Candidate Response</div>
       <p className="text-sm text-gray-500">Created on {new Date(candidateInfo.createdAt).toLocaleString()}</p>
@@ -65,6 +68,8 @@ const CandidateResponse = ({ data }) => {
           ))}
         </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 };

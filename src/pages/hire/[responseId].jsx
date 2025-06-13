@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import CandidateResponse from './CandidateResponse';
-import { API_BASE_URL } from '../utils/constants';
+import { API_BASE_URL } from '../../utils/constants';
 import { useParams } from 'react-router-dom';
 
 const CandidateResponsePage = () => {
@@ -12,10 +12,9 @@ const CandidateResponsePage = () => {
     axios.get(`${API_BASE_URL}/responses/${responseId}`).then((res) => {
       if (res.data.success) {
         setData(res.data.data);
-        console.log('data: ',data);
       }
     });
-  }, []);
+  }, [null]);
 
   return (
     <div>
