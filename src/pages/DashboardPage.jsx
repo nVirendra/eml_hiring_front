@@ -5,11 +5,14 @@ import { API_BASE_URL } from '../utils/constants';
 
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
+  const [selectedTech, setSelectedTech] = useState('');
+  console.log('selectedTech: ',selectedTech);
 
-  useEffect(() => {
-    const fetchStats = async () => {
+  const fetchStats = async (tech='') => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/dashboard/stats`);
+        const res = await axios.get(`${API_BASE_URL}/dashboard/stats`,{
+                  params: tech ? { tech } : {},
+        });
         if (res.data.success) {
           setStats(res.data.data);
         }
@@ -18,14 +21,20 @@ const DashboardPage = () => {
       }
     };
 
-    fetchStats();
-  }, []);
+  useEffect(() => {
+    fetchStats(selectedTech);
+  }, [selectedTech]);
+
+  const handleTechClick = (techId) => {
+    setSelectedTech((prev) => (prev === techId ? '' : techId)); // Toggle filter
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="max-w-5xl mx-auto space-y-8 bg-white p-6 rounded-xl shadow-md">
         <h1 className="text-2xl font-bold text-indigo-700">📊 Dashboard Overview</h1>
-        {stats ? <DashboardStats stats={stats} /> : <p>Loading...</p>}
+        {stats ? <DashboardStats stats={stats} onTechClick={handleTechClick} selectedTech={selectedTech}/> : <p>Loading...</p>}
       </div>
     </div>
   );
