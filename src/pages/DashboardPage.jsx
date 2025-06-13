@@ -7,7 +7,7 @@ const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [selectedTech, setSelectedTech] = useState('');
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(1); // default page size
+  const [limit, setLimit] = useState(5); // default page size
 
   const handleLimitChange = (e) => {
     setLimit(parseInt(e.target.value));

@@ -692,6 +692,7 @@ const CandidateForm = () => {
           {step < 4 && (
             <button
             type="button"
+            disabled={step === 2 && isSubmitting}
             onClick={handleNext}
             className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
           >

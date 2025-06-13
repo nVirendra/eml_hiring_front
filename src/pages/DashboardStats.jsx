@@ -56,7 +56,7 @@ const DashboardStats = ({ stats,onTechClick ,selectedTech, page, setPage, limit,
     onChange={onLimitChange}
     className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
   >
-    {[10, 30, 50].map((val) => (
+    {[5,10, 30, 50].map((val) => (
       <option key={val} value={val}>
         {val}
       </option>
@@ -70,7 +70,7 @@ const DashboardStats = ({ stats,onTechClick ,selectedTech, page, setPage, limit,
   <>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {recentResponses.map((resp) => (
-        <Link to={`/candidate-response/${resp._id}`} key={resp._id}>
+        <Link to={`/hire/candidate-response/${resp._id}`} key={resp._id}>
                       <div className="border border-gray-200 rounded-xl p-5 bg-white hover:shadow-lg transition duration-300 ease-in-out">
                         <div className="flex justify-between items-start mb-3">
                           <div>
