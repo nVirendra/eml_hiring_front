@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Edit3, Eye, Copy, Trash2, Loader2, AlertCircle, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
+import { API_BASE_URL } from '../../utils/constants';
 
 const FormsListPage = () => {
   const [forms, setForms] = useState([]);
@@ -16,7 +16,6 @@ const FormsListPage = () => {
   const navigate = useNavigate();
 
 
-  const API_BASE_URL = 'http://localhost:5000/api';
 
   // Fetch forms data
   const fetchForms = async (page = 1, filters = {}) => {
