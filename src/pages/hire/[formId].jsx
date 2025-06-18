@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, X, Edit3, Save, Loader2, AlertCircle, Check } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/constants';
+import Header from '../../components/Header';
+import { useParams } from 'react-router-dom';
 
 const EvaluationFormEditor = () => {
+  const {formId} =useParams();
+  console.log('from param',formId);
+ 
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -13,87 +18,34 @@ const EvaluationFormEditor = () => {
   
 
   // Fetch form data from API
-  const fetchFormData = async (technology = 'Flutter') => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Replace with your actual API call
-      const response = await fetch(`${API_BASE_URL}/forms/${technology}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch form data');
-      }
-      
-      const result = await response.json();
-      
-      if (result.success && result.data && result.data.length > 0) {
-        const form = result.data[0];
-        setFormData(form);
-        setEditingForm({ ...form });
-      } else {
-        throw new Error('No form data found');
-      }
-    } catch (err) {
-      setError(err.message);
-      // For demo purposes, use mock data
-      //loadMockData();
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchFormData = async (formId = '') => {
+  try {
+    setLoading(true);
+    setError(null);
 
-  // Load mock data for demonstration
-  const loadMockData = () => {
-    const mockData = {
-      "_id": "685222fb3d69fe715e248b38",
-      "technology": "Flutter",
-      "questions": [
-        {
-          "id": "1750212849265",
-          "type": "number",
-          "question": "How many Flutter apps have you developed?",
-          "options": [
-            { "label": "", "value": "1", "points": 2, "_id": "685222fb3d69fe715e248b3a" },
-            { "label": "", "value": "2", "points": 5, "_id": "685222fb3d69fe715e248b3b" },
-            { "label": "", "value": "3", "points": 10, "_id": "685222fb3d69fe715e248b3c" }
-          ],
-          "scoring": { "1": 2, "2": 5, "3": 10 },
-          "_id": "685222fb3d69fe715e248b39"
-        },
-        {
-          "id": "1750212967941",
-          "type": "checkbox",
-          "question": "Which state management libraries have you used?",
-          "options": [
-            { "label": "Riverpod", "value": "Riverpod", "points": 5, "_id": "685222fb3d69fe715e248b3e" },
-            { "label": "Provider", "value": "Provider", "points": 3, "_id": "685222fb3d69fe715e248b3f" },
-            { "label": "BLoC", "value": "BLoC", "points": 4, "_id": "685222fb3d69fe715e248b40" }
-          ],
-          "scoring": { "Provider": 3, "Riverpod": 5, "BLoC": 4 },
-          "_id": "685222fb3d69fe715e248b3d"
-        },
-        {
-          "id": "1750213017989",
-          "type": "select",
-          "question": "Have you integrated native code in a Flutter app (platform channels)?",
-          "options": [
-            { "label": "Yes", "value": "Yes", "points": 5, "_id": "685222fb3d69fe715e248b42" },
-            { "label": "No", "value": "No", "points": 0, "_id": "685222fb3d69fe715e248b43" }
-          ],
-          "scoring": { "Yes": 5, "No": 0 },
-          "_id": "685222fb3d69fe715e248b41"
-        }
-      ],
-      "createdBy": "admin",
-      "isActive": true,
-      "createdAt": "2025-06-18T02:22:51.895Z",
-      "updatedAt": "2025-06-18T02:22:51.895Z"
-    };
-    
-    setFormData(mockData);
-    setEditingForm({ ...mockData });
-  };
+    const response = await fetch(`${API_BASE_URL}/forms/getFormById/${formId}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch form data');
+    }
+
+    const result = await response.json();
+    console.log('Fetched result:', result);
+
+    if (result.success && result.data) {
+      const form = result.data; // ✅ No array, this is the object directly
+      setFormData(form);
+      setEditingForm({ ...form });
+    } else {
+      throw new Error('No form data found');
+    }
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Save form data to API
   const saveFormData = async () => {
@@ -112,7 +64,7 @@ const EvaluationFormEditor = () => {
           }, {})
         }))
       };
-
+      
       // Replace with your actual API call
       const response = await fetch(`${API_BASE_URL}/forms/${editingForm._id}`, {
         method: 'PUT',
@@ -147,8 +99,11 @@ const EvaluationFormEditor = () => {
   };
 
   useEffect(() => {
-    fetchFormData();
-  }, []);
+  if (formId) {
+    fetchFormData(formId);
+  }
+}, [formId]);
+
 
   // Add new question
   const addQuestion = () => {
@@ -160,7 +115,6 @@ const EvaluationFormEditor = () => {
         { label: 'Option 1', value: 'option1', points: 1, _id: Date.now().toString() + '1' }
       ],
       scoring: { option1: 1 },
-      _id: Date.now().toString() + '_q'
     };
 
     setEditingForm(prev => ({
@@ -265,6 +219,10 @@ const EvaluationFormEditor = () => {
   }
 
   return (
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+      
+      <div className="max-w-5xl mx-auto space-y-8 bg-white p-6 rounded-xl shadow-md">
+        <Header/>
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -459,6 +417,8 @@ const EvaluationFormEditor = () => {
           </div>
         </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 };

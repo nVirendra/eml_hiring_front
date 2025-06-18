@@ -3,7 +3,7 @@ import { Plus, Trash2, Edit3, Save, X } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '../../utils/constants';
 import Header from '../../components/Header';
-
+import FormsListPage from './AllFormList';
 const DynamicFormSystem = () => {
   const [activeTab, setActiveTab] = useState('admin');
   const [forms, setForms] = useState([]);
@@ -343,6 +343,9 @@ const DynamicFormSystem = () => {
           </div>
         )}
       </div>
+      <div className="mt-16">
+  <FormsListPage />
+</div>
       </div>
     );
   };
