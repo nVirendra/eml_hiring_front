@@ -7,11 +7,13 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import LoginPage from '../pages/Login';
 import Logout from '../pages/Logout';
 import EvaluationFormEditor from '../pages/hire/[formId]';
+import LandingPage from '../pages/LandingPage';
 const AppRouter = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<CandidateForm/>} />
+        <Route path="/" element={<LandingPage/>} />
+        <Route path="/hire/register" element={<CandidateForm/>} />
         <Route path="/adm-login" element={<LoginPage/>} />
         <Route path="/logout" element={<Logout />} />
         <Route path='/hire/form-builder' element={<ProtectedRoute><DynamicFormSystem/></ProtectedRoute>} />

@@ -11,6 +11,10 @@ const CandidateForm = () => {
   const [step, setStep] = useState(1);
   const [dynamicQuestions, setDynamicQuestions] = useState([]);
 
+  const [selectedFileName, setSelectedFileName] = useState('');
+
+
+
   const {
     register,
     handleSubmit,
@@ -30,6 +34,7 @@ const CandidateForm = () => {
       gender: '',
       state: '',
       city: '',
+      permanent_city:'',
       experience: 0,
       file: null,
       currentCompany: '',
@@ -73,6 +78,7 @@ const CandidateForm = () => {
   const handleResumeChange = (e, onChange) => {
     const resume = e.target.files?.[0];
     if (resume) {
+      setSelectedFileName(resume.name);
       onChange(resume);
       trigger('file');
     }
@@ -101,7 +107,7 @@ const CandidateForm = () => {
     
     switch (currentStep) {
       case 1:
-        fieldsToValidate = ['name', 'phone', 'email', 'dob','gender', 'state', 'city', 'experience', 'file'];
+        fieldsToValidate = ['name', 'phone', 'email', 'dob','gender', 'state', 'city','permanent_city', 'experience', 'file'];
         break;
       case 2:
         // No validation required for company info fields - they are optional
@@ -256,7 +262,7 @@ const CandidateForm = () => {
           {/* Logo Section */}
           <div className="flex justify-center">
             <div className="w-24 h-12 sm:w-32 sm:h-16 rounded-xl flex items-center justify-center shadow-md bg-white">
-              <img src="emilo-logo.png" alt="Emilo Logo" className="h-8 sm:h-12 object-contain" />
+              <img src="/emilof.jpg" alt="Emilo Logo" className="h-8 sm:h-12 object-contain" />
             </div>
           </div>
 
@@ -277,6 +283,7 @@ const CandidateForm = () => {
               setValue('dob', '');
               setValue('state', '');
               setValue('city', '');
+              setValue('permanent_city','')
               setValue('experience', 0);
               setValue('file', null);
               setValue('currentCompany', '');
@@ -310,10 +317,10 @@ const CandidateForm = () => {
         {/* Header */}
         <div className="text-center border-b border-gray-200 p-4 sm:p-6">
           <div className="flex justify-center mb-3">
-            <img src="emilo-logo.png" alt="Emilo Logo" className="h-10 sm:h-12 w-auto" />
+            <img src="/emilof.jpg" alt="Emilo Logo" className="h-10 sm:h-12 w-auto" />
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Emilo Ventures</h1>
-          <p className="text-xs sm:text-sm md:text-base text-indigo-600 font-medium mt-1">If it's there, it's here</p>
+          <p className="text-xs p-2 sm:text-sm md:text-base text-indigo-600 font-medium mt-1">If it's there, it's here</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Emilo Ventures Pvt. Ltd.</h1>
           <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mt-2">Join Our Growing Team</h2>
           <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-1 max-w-2xl mx-auto leading-relaxed">
             We're looking for passionate developers to join our team. Complete the application form to get started.
@@ -490,7 +497,7 @@ const CandidateForm = () => {
                   {/* City */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      City <span className="text-red-500">*</span>
+                      Current City <span className="text-red-500">*</span>
                     </label>
                     <input
                       {...register('city', { 
@@ -500,67 +507,116 @@ const CandidateForm = () => {
                       className={`w-full border rounded-md p-3 text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
                         errors.city ? 'border-red-500' : 'border-gray-300'
                       }`}
-                      placeholder="Enter your city"
+                      placeholder="Enter your current city"
                     />
                     {errors.city && (
                       <p className="text-sm text-red-600">{errors.city.message}</p>
                     )}
                   </div>
 
-                  {/* Experience */}
+                  {/* Permanent City */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      Experience (in months) <span className="text-red-500">*</span>
+                      Permanent Current City <span className="text-red-500">*</span>
                     </label>
                     <input
-                      {...register('experience', { 
-                        required: 'Experience is required',
-                        min: { value: 0, message: 'Experience cannot be negative' },
-                        valueAsNumber: true
+                      {...register('permanent_city', { 
+                        required: 'Permanent City is required'
                       })}
-                      type="number"
-                      min="0"
+                      type="text"
                       className={`w-full border rounded-md p-3 text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
-                        errors.experience ? 'border-red-500' : 'border-gray-300'
+                        errors.permanent_city ? 'border-red-500' : 'border-gray-300'
                       }`}
-                      placeholder="Enter experience in months"
+                      placeholder="Enter your permanent city"
                     />
-                    {errors.experience && (
-                      <p className="text-sm text-red-600">{errors.experience.message}</p>
+                    {errors.permanent_city && (
+                      <p className="text-sm text-red-600">{errors.permanent_city.message}</p>
                     )}
+                  </div>
+
+                  
+                </div>
+
+                
+                {/* Resume and Experience Inputs Inline with Conditional Experience */}
+                <div className="space-y-4">
+                  {/* Has Experience Checkbox */}
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="hasExperience"
+                      {...register('hasExperience')}
+                      className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                    />
+                    <label htmlFor="hasExperience" className="text-sm font-medium text-gray-700">
+                      Do you have any experience?
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0">
+                    {/* Conditionally show Experience input */}
+                    {watch('hasExperience') && (
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Experience (in months) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          {...register('experience', {
+                            required: 'Experience is required',
+                            min: { value: 0, message: 'Experience cannot be negative' },
+                            valueAsNumber: true,
+                          })}
+                          type="number"
+                          min="0"
+                          className={`w-full border rounded-md p-3 text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
+                            errors.experience ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Enter experience in months"
+                        />
+                        {errors.experience && (
+                          <p className="text-sm text-red-600">{errors.experience.message}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Resume Upload */}
+                    <div className={`flex-1 ${!watch('hasExperience') ? 'sm:w-full' : ''}`}>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Upload Resume <span className="text-red-500">*</span>
+                      </label>
+                      <Controller
+                        name="file"
+                        control={control}
+                        rules={{ required: 'Resume is required' }}
+                        render={({ field: { onChange, value, ...field } }) => (
+                          <div>
+                            <input
+                              key={selectedFileName}
+                              {...field}
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              onChange={(e) => handleResumeChange(e, onChange)}
+                              className={`block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
+                                errors.file ? 'border-red-500' : 'border-gray-300'
+                              }`}
+                            />
+                            {selectedFileName && (
+                              <p className="text-sm text-gray-600 mt-1">Selected file: {selectedFileName}</p>
+                            )}
+                            <p className="text-xs text-gray-500 mt-1">
+                              Accepted formats: PDF, DOC, DOCX (Max size: 5MB)
+                            </p>
+                          </div>
+                        )}
+                      />
+                      {errors.file && (
+                        <p className="text-sm text-red-600">{errors.file.message}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Resume Upload */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Upload Resume <span className="text-red-500">*</span>
-                  </label>
-                  <Controller
-                    name="file"
-                    control={control}
-                    rules={{ required: 'Resume is required' }}
-                    render={({ field: { onChange, value, ...field } }) => (
-                      <div className="space-y-2">
-                        <input
-                          {...field}
-                          type="file"
-                          accept=".pdf,.doc,.docx"
-                          onChange={(e) => handleResumeChange(e, onChange)}
-                          className={`block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
-                            errors.file ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                        />
-                        <p className="text-xs text-gray-500">
-                          Accepted formats: PDF, DOC, DOCX (Max size: 5MB)
-                        </p>
-                      </div>
-                    )}
-                  />
-                  {errors.file && (
-                    <p className="text-sm text-red-600">{errors.file.message}</p>
-                  )}
-                </div>
+
               </div>
             )}
 
