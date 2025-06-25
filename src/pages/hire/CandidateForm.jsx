@@ -36,6 +36,7 @@ const CandidateForm = () => {
       city: '',
       permanent_city:'',
       experience: 0,
+      selfDeclaration: false,
       file: null,
       currentCompany: '',
       companyState: '',
@@ -195,54 +196,70 @@ const CandidateForm = () => {
             </div>
           );
         case 'checkbox':
-          return (
-            <div key={q.id} className="space-y-3">
-              <label className="block font-medium text-gray-700 text-sm sm:text-base">
-                {q.question} <span className="text-red-500">*</span>
-              </label>
-              <Controller
-                name={`questions.${q.id}`}
-                control={control}
-                rules={{ 
-                  required: 'Please select at least one option',
-                  validate: value => (Array.isArray(value) && value.length > 0) || 'Please select at least one option'
-                }}
-                defaultValue={[]}
-                render={({ field: { onChange, value = [] } }) => (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {q.options.map((opt) => (
-                      <label
-                        key={opt._id}
-                        className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 cursor-pointer transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          value={opt.value}
-                          checked={value.includes(opt.value)}
-                          onChange={(e) => {
-                            const updated = new Set(value);
-                            e.target.checked
-                              ? updated.add(opt.value)
-                              : updated.delete(opt.value);
-                            onChange(Array.from(updated));
-                          }}
-                          className="h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500"
-                        />
-                        <span className="text-sm sm:text-base text-gray-700">
-                          {opt.label || opt.value}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              />
-              {errors.questions?.[q.id] && (
-                <p className="text-sm text-red-600">
-                  {errors.questions[q.id].message}
-                </p>
-              )}
-            </div>
-          );
+  return (
+    <div key={q.id} className="space-y-3">
+      <label className="block font-medium text-gray-700 text-sm sm:text-base">
+        {q.question} <span className="text-red-500">*</span>
+      </label>
+      <Controller
+        name={`questions.${q.id}`}
+        control={control}
+        rules={{ 
+          required: 'Please select at least one option',
+          validate: value => (Array.isArray(value) && value.length > 0) || 'Please select at least one option'
+        }}
+        defaultValue={[]}
+        render={({ field: { onChange, value = [] } }) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {q.options.map((opt) => {
+              const isNoneOption = opt.value.toLowerCase() === 'none';
+              const isChecked = value.includes(opt.value);
+
+              return (
+                <label
+                  key={opt._id}
+                  className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    value={opt.value}
+                    checked={isChecked}
+                    onChange={(e) => {
+                      let updated = [...value];
+                      const isCheckedNow = e.target.checked;
+
+                      if (isNoneOption && isCheckedNow) {
+                        // If "None" is checked, uncheck everything else
+                        updated = [opt.value];
+                      } else if (!isNoneOption && isCheckedNow) {
+                        // Remove "None" if any other option is selected
+                        updated = [...updated.filter(val => val.toLowerCase() !== 'none'), opt.value];
+                      } else {
+                        // Remove unchecked option
+                        updated = updated.filter(val => val !== opt.value);
+                      }
+
+                      onChange(updated);
+                    }}
+                    className="h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <span className="text-sm sm:text-base text-gray-700">
+                    {opt.label || opt.value}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      />
+      {errors.questions?.[q.id] && (
+        <p className="text-sm text-red-600">
+          {errors.questions[q.id].message}
+        </p>
+      )}
+    </div>
+  );
+
         default:
           return null;
       }
@@ -786,58 +803,88 @@ const CandidateForm = () => {
             )}
 
             {/* Navigation */}
-            <div className="flex flex-col sm:flex-row justify-between items-center pt-6 space-y-3 sm:space-y-0 border-t border-gray-200">
-              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                {step > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setStep(step - 1)}
-                    className="w-full sm:w-auto px-6 py-3 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
-                  >
-                    ← Back
-                  </button>
-                )}
-                
-                {step < 4 ? (
-                  <button
-                    type="button"
-                    disabled={step === 2 && isSubmitting}
-                    onClick={handleNext}
-                    className={`w-full sm:w-auto px-6 py-3 rounded-md text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                      step === 2 && isSubmitting 
-                        ? 'bg-indigo-400 cursor-not-allowed' 
-                        : 'bg-indigo-600 hover:bg-indigo-700'
-                    }`}
-                  >
-                    {step === 2 ? (isSubmitting ? 'Saving...' : 'Save & Continue →') : 'Next →'}
-                  </button>
-                ) : (
-                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="w-full sm:w-auto px-6 py-3 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
-                    >
-                      ✏️ Edit Application
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className={`w-full sm:w-auto px-8 py-3 rounded-md text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
-                        isSubmitting ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                      }`}
-                    >
-                      {isSubmitting ? '⏳ Submitting...' : '🚀 Submit Application'}
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              {/* Progress indicator */}
-              <div className="text-xs sm:text-sm text-gray-500 order-first sm:order-last">
-                Step {step} of {stepTitles.length}
-              </div>
-            </div>
+            {/* Navigation */}
+<div className="flex flex-col gap-4 sm:gap-6 pt-6 border-t border-gray-200">
+  {/* ✅ Self Declaration - Inline and only on final step */}
+  {step === 4 && (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <label className="flex items-start sm:items-center gap-2 text-sm text-gray-700">
+        <input
+          type="checkbox"
+          {...register('selfDeclaration', {
+            required: 'You must accept the declaration before submitting',
+          })}
+          className="mt-1 sm:mt-0 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+        />
+        <span>
+          I hereby declare that the information provided is true to the best of my knowledge.
+          <span className="text-red-500">*</span>
+        </span>
+      </label>
+      {errors.selfDeclaration && (
+        <p className="text-sm text-red-600 sm:ml-auto">{errors.selfDeclaration.message}</p>
+      )}
+    </div>
+  )}
+
+  {/* Buttons and Progress */}
+  <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+    {/* Buttons */}
+    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+      {step > 1 && (
+        <button
+          type="button"
+          onClick={() => setStep(step - 1)}
+          className="w-full sm:w-auto px-6 py-3 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
+        >
+          ← Back
+        </button>
+      )}
+
+      {step < 4 ? (
+        <button
+          type="button"
+          disabled={step === 2 && isSubmitting}
+          onClick={handleNext}
+          className={`w-full sm:w-auto px-6 py-3 rounded-md text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+            step === 2 && isSubmitting
+              ? 'bg-indigo-400 cursor-not-allowed'
+              : 'bg-indigo-600 hover:bg-indigo-700'
+          }`}
+        >
+          {step === 2 ? (isSubmitting ? 'Saving...' : 'Save & Continue →') : 'Next →'}
+        </button>
+      ) : (
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            className="w-full sm:w-auto px-6 py-3 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
+          >
+            ✏️ Edit Application
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full sm:w-auto px-8 py-3 rounded-md text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
+              isSubmitting
+                ? 'bg-green-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700'
+            }`}
+          >
+            {isSubmitting ? '⏳ Submitting...' : '🚀 Submit Application'}
+          </button>
+        </div>
+      )}
+    </div>
+
+    {/* Progress indicator */}
+    <div className="text-xs sm:text-sm text-gray-500 order-first sm:order-last">
+      Step {step} of {stepTitles.length}
+    </div>
+  </div>
+</div>
+
           </form>
         </div>
       </div>
