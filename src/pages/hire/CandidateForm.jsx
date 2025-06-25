@@ -2,8 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import axios from 'axios';
 import { API_BASE_URL } from '../../utils/constants';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+
+
+const SITE_KEY = '6Le-M20rAAAAABbp20A5-kajh-8udeBhNhrkGAzx'; // From Google
 
 const CandidateForm = () => {
+
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,7 +93,9 @@ const CandidateForm = () => {
     }
   };
 
-  const onSubmit = async (data) => {
+
+
+   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
       const result = await axios.post(`${API_BASE_URL}/responses`, data, {
@@ -386,10 +396,17 @@ const CandidateForm = () => {
                       Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
-                      {...register('name', { 
-                        required: 'Name is required',
-                        minLength: { value: 2, message: 'Name must be at least 2 characters' }
-                      })}
+                      {
+                        ...register("name", {
+                          required: "Name is required",
+                          minLength: { value: 2, message: "Name must be at least 2 characters" },
+                          validate: (value) => {
+                            const hasScript = /<script.*?>.*?<\/script>/gi.test(value);
+                            const hasURL = /https?:\/\/|www\./gi.test(value);
+                            return !hasScript && !hasURL || "Invalid input: remove script or links";
+                          },
+                        })
+                      }
                       type="text"
                       className={`w-full border rounded-md p-3 text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
                         errors.name ? 'border-red-500' : 'border-gray-300'
@@ -498,7 +515,12 @@ const CandidateForm = () => {
                     </label>
                     <input
                       {...register('state', { 
-                        required: 'State is required'
+                        required: 'State is required',
+                        validate: (value) => {
+                            const hasScript = /<script.*?>.*?<\/script>/gi.test(value);
+                            const hasURL = /https?:\/\/|www\./gi.test(value);
+                            return !hasScript && !hasURL || "Invalid input: remove script or links";
+                          },
                       })}
                       type="text"
                       className={`w-full border rounded-md p-3 text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
@@ -518,7 +540,12 @@ const CandidateForm = () => {
                     </label>
                     <input
                       {...register('city', { 
-                        required: 'City is required'
+                        required: 'City is required',
+                        validate: (value) => {
+                            const hasScript = /<script.*?>.*?<\/script>/gi.test(value);
+                            const hasURL = /https?:\/\/|www\./gi.test(value);
+                            return !hasScript && !hasURL || "Invalid input: remove script or links";
+                          },
                       })}
                       type="text"
                       className={`w-full border rounded-md p-3 text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
@@ -538,7 +565,12 @@ const CandidateForm = () => {
                     </label>
                     <input
                       {...register('permanent_city', { 
-                        required: 'Permanent City is required'
+                        required: 'Permanent City is required',
+                        validate: (value) => {
+                            const hasScript = /<script.*?>.*?<\/script>/gi.test(value);
+                            const hasURL = /https?:\/\/|www\./gi.test(value);
+                            return !hasScript && !hasURL || "Invalid input: remove script or links";
+                          },
                       })}
                       type="text"
                       className={`w-full border rounded-md p-3 text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors ${
@@ -582,6 +614,11 @@ const CandidateForm = () => {
                             required: 'Experience is required',
                             min: { value: 0, message: 'Experience cannot be negative' },
                             valueAsNumber: true,
+                            validate: (value) => {
+                            const hasScript = /<script.*?>.*?<\/script>/gi.test(value);
+                            const hasURL = /https?:\/\/|www\./gi.test(value);
+                            return !hasScript && !hasURL || "Invalid input: remove script or links";
+                          },
                           })}
                           type="number"
                           min="0"
@@ -803,7 +840,6 @@ const CandidateForm = () => {
             )}
 
             {/* Navigation */}
-            {/* Navigation */}
 <div className="flex flex-col gap-4 sm:gap-6 pt-6 border-t border-gray-200">
   {/* ✅ Self Declaration - Inline and only on final step */}
   {step === 4 && (
@@ -817,7 +853,7 @@ const CandidateForm = () => {
           className="mt-1 sm:mt-0 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
         />
         <span>
-          I hereby declare that the information provided is true to the best of my knowledge.
+          I hereby confirm that personal information and Resume provided by me is true and accurate.
           <span className="text-red-500">*</span>
         </span>
       </label>
@@ -826,6 +862,8 @@ const CandidateForm = () => {
       )}
     </div>
   )}
+
+
 
   {/* Buttons and Progress */}
   <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
