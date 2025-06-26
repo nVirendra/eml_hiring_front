@@ -9,6 +9,10 @@ const SITE_KEY = '6Le-M20rAAAAABbp20A5-kajh-8udeBhNhrkGAzx'; // From Google
 
 const CandidateForm = () => {
 
+   useEffect(() => {
+      document.title = "Hire | Emilo";
+    }, []);
+
   const { executeRecaptcha } = useGoogleReCaptcha();
 
 
